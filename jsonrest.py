@@ -42,3 +42,12 @@ def parse_post(params):
   except:
     logging.error("error decoding post'%s'" %params)
 
+def dumps(datadict):
+  r = simplejson.dumps(datadict)
+  r = r.replace('\"','')
+  r = r.replace('\'','\"')
+  logging.info(r)
+  return r
+
+def loads(datastr):
+  return simplejson.loads(datastr)

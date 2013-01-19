@@ -17,3 +17,5 @@ def getHostByName(hostname):
   hosts = hosts.filter('hostname =', hostname)
   host = hosts[0]
   return host
+
+

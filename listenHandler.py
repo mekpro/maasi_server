@@ -7,9 +7,6 @@ import logging
 import jsonrest
 import models
 
-def values_dumps(values_dict):
-  return simplejson.dumps(values_dict)
-
 class Listen(webapp.RequestHandler):
   def post(self):
     post = jsonrest.parse_post(self.request.body)
@@ -18,7 +15,9 @@ class Listen(webapp.RequestHandler):
     values = post['values']
 
     ctime = datetime.datetime.strptime(ctime,"%Y-%m-%d %H:%M:%S")
-    values_str = values_dumps(values)
+    logging.info(values)
+    values_str = jsonrest.dumps(values)
+    logging.info(values_str)
     host = models.getHostByName(hostname)
     values = models.Value(host=host, ctime=ctime, values=values_str)
     values.put()
