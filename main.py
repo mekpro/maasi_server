@@ -10,12 +10,12 @@ import adminHandler
 
 def main():
   application = webapp.WSGIApplication([
-    (r'/', Homepage),
+#    (r'/', Homepage),
     # get Handlers
-    (r'/get', getHandler.Hostlist),
-    (r'/get/(.*)', getHandler.Modulelist),
-    (r'/get/(.*)/(.*)', getHandler.Metriclist),
     (r'/get/(.*)/(.*)/(.*)', getHandler.Data),
+    (r'/get/(.*)/(.*)', getHandler.MetricList),
+    (r'/get/(.*)', getHandler.ModuleList),
+    (r'/get', getHandler.HostList),
     (r'/getall/(.*)', getHandler.GetAllFromHostname),
 
     # listen Handlers
@@ -25,7 +25,7 @@ def main():
     (r'/config/newhost', configHandler.NewHost),
 
     # admin Handlers 
-    (r'/admin/cleardata', adminHandler.ClearDataHandler),
+    (r'/admin/cleardata', adminHandler.ClearData),
 
     ], debug=True)
   util.run_wsgi_app(application)

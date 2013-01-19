@@ -1,24 +1,15 @@
 from google.appengine.ext import db
 from google.appengine.ext import webapp
+import logging
 
 import jsonrest
+import models
 
-class Hostlist():
-  def post():
-    hostlist = ['host1','host2','host3']
-    self.response.out.write(jsonrest.response(hostlist))
-
-class Modulelist():
-  def post(hostname):
-    modulelist = ['loadavg','netinterface']
-    self.response.out.write(jsonrest.response(modulelist))
-
-class MetricList():
-  def post(hostname, modulename):
-  metriclist = ['load1m','load5m','load15m','p_idle','p_active']
-  self.response.out.write(jsonrest.response(metriclist))
-
-class Data():
-  def post(hostname, modulename, metricname):
-    r = [0,1,2,3,4,5,6,7]
-    self.response.out.write(jsonrest.response(r))
+class NewHost(webapp.RequestHandler):
+  def post(self):
+    post = jsonrest.parse_post(self.request.body)
+    hostname = post['hostname']
+    host = models.Host(hostname=hostname, configs='{}')
+    host.put()
+    logging.info('Host %s Created' %hostname)
+    self.response.out.write(jsonrest.response(0))
