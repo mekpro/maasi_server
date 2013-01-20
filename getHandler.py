@@ -82,9 +82,15 @@ class Data(webapp.RequestHandler):
 
     q = models.Value.all()
     q.filter('host =', host)
-    logging.info(q.count())
+    q.order('-ctime')
+    if datatype == 'last':
+      v = q[0]
+      values = jsonrest.loads(v.values)
+      if modulename in values:
+        if metricname in values[modulename]:
+          r = (values[modulename][metricname])
+
     q.filter('ctime >', start_time).filter('ctime <', end_time)
-    logging.info(q.count())
 
     if datatype == 'range':
      for v in q.run(limit=settings.query_rows_limit):
@@ -92,9 +98,6 @@ class Data(webapp.RequestHandler):
         if modulename in values:
           if metricname in values[modulename]:
             r.append(values[modulename][metricname])
-
-    elif datatype == 'last':
-      pass
     elif datatype == 'time_range':
       pass
     elif datatype == 'average':

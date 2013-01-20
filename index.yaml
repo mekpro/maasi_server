@@ -14,3 +14,9 @@ indexes:
   properties:
   - name: host
   - name: ctime
+
+- kind: Value
+  properties:
+  - name: host
+  - name: ctime
+    direction: desc

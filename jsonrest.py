@@ -2,6 +2,7 @@ import urllib2
 import urllib
 import urlparse
 import logging
+import datetime
 
 try:
   import simplejson
@@ -9,6 +10,12 @@ except ImportError:
   from django.utils import simplejson
 
 TIMEFORMAT="%Y-%m-%d %H:%M:%S"
+
+def strftime(dt):
+  return datetime.datetime.strftime(dt, TIMEFORMAT)
+
+def strptime(st):
+  return datetime.datetime.strptime(st, TIMEFORMAT)
 
 class Client():
   def __init__(self, server_url):
