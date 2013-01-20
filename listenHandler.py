@@ -15,7 +15,6 @@ class Listen(webapp.RequestHandler):
     values = post['values']
 
     ctime = datetime.datetime.strptime(ctime,"%Y-%m-%d %H:%M:%S")
-    logging.info(values)
     values_str = jsonrest.dumps(values)
     logging.info(values_str)
     host = models.getHostByName(hostname)

@@ -31,12 +31,28 @@ class ModuleList(webapp.RequestHandler):
 
 class MetricList(webapp.RequestHandler):
   def post(self, hostname, modulename):
-    metriclist = ['load1m','load5m','load15m','p_idle','p_active']
-    self.response.out.write(jsonrest.response(metriclist))
+    metrics = []
+    host = models.getHostByName(hostname)
+    q = models.Value.all()
+    q = q.filter("host =", host).order("ctime")
+    if q.count(limit=1) != 0:
+      latest_values = q[0]
+      values = latest_values.values
+      logging.info(values)
+      vd = jsonrest.loads(values)
+      vdm = vd[modulename]
+      for k,v in vdm.iteritems():
+        metrics.append(k)
+    self.response.out.write(jsonrest.response(metrics))
 
 class Data(webapp.RequestHandler):
   def post(self, hostname, modulename, metricname):
-    r = [0,1,2,3,4,5,6,7]
+    r = []
+    host = models.getHostByName(hostname)
+    post = jsonrest.parse_post(self.request.body)
+#    starttime = 
+#   how do we know if params exits ?
+
     self.response.out.write(jsonrest.response(r))
 
 class GetAllFromHostname(webapp.RequestHandler):
