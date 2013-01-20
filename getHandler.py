@@ -2,7 +2,10 @@ from google.appengine.ext import db
 from google.appengine.ext import webapp
 from django.utils import simplejson
 
+import datetime
 import logging
+
+import settings
 import jsonrest
 import models
 
@@ -50,8 +53,52 @@ class Data(webapp.RequestHandler):
     r = []
     host = models.getHostByName(hostname)
     post = jsonrest.parse_post(self.request.body)
-#    starttime = 
-#   how do we know if params exits ?
+    if 'end_time' in post:
+      end_time = datetime.datetime.strptime(post['end_time'], jsonrest.TIMEFORMAT)
+    else:
+      end_time = datetime.datetime.now()
+
+    if 'start_time' in post:
+      start_time = datetime.datetime.strptime(post['start_time'], jsonrest.TIMEFORMAT)
+    else:
+      start_time = end_time - settings.default_get_timerange
+
+    if 'sampling' in post:
+      sampling = int(post['sample'])
+    else:
+      sampling = settings.default_get_sampling
+
+    if 'datatype' in post:
+      if post['datatype'] == 'time_range':
+        datatype = 'time_range'
+      elif post['datatype'] == 'average':
+        datatype = 'average'
+      elif post['datatype'] == 'range':
+        datatype = 'range'
+      elif post['datatype'] == 'last':
+        datatype = 'last'
+    else:
+      datatype = 'last'
+
+    q = models.Value.all()
+    q.filter('host =', host)
+    logging.info(q.count())
+    q.filter('ctime >', start_time).filter('ctime <', end_time)
+    logging.info(q.count())
+
+    if datatype == 'range':
+     for v in q.run(limit=settings.query_rows_limit):
+        values = jsonrest.loads(v.values)
+        if modulename in values:
+          if metricname in values[modulename]:
+            r.append(values[modulename][metricname])
+
+    elif datatype == 'last':
+      pass
+    elif datatype == 'time_range':
+      pass
+    elif datatype == 'average':
+      pass
 
     self.response.out.write(jsonrest.response(r))
 

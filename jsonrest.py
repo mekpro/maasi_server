@@ -8,6 +8,8 @@ try:
 except ImportError:
   from django.utils import simplejson
 
+TIMEFORMAT="%Y-%m-%d %H:%M:%S"
+
 class Client():
   def __init__(self, server_url):
     self.server_url = server_url

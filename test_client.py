@@ -1,4 +1,5 @@
 import jsonrest
+import datetime
 
 c = jsonrest.Client("http://localhost:8080/")
 
@@ -25,9 +26,13 @@ listen_data = {
   }
 
 print c.request("config/newhost", {"hostname": "peacewalker"})
-print c.request("listen", listen_data)
+for i in range(0,60):
+  ctime = datetime.datetime.now() + datetime.timedelta(minutes=i)
+  listen_data["ctime"] = datetime.datetime.strftime(ctime, jsonrest.TIMEFORMAT)
+  print c.request("listen", listen_data)
+
 print c.request("get", {})
 print c.request("get/peacewalker", {})
 print c.request("get/peacewalker/loadavg", {})
-print c.request("get/peacewalker/loadavg/load1m", {})
+print c.request("get/peacewalker/loadavg/load1m", {'datatype':'range'})
 print c.request("getall/peacewalker", {})
