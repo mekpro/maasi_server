@@ -27,17 +27,19 @@ listen_data = {
 
 print c.request("config/newhost", {"hostname": "peacewalker"})
 for i in range(0,60):
-  ctime = datetime.datetime.now() + datetime.timedelta(minutes=i)
-  listen_data["ctime"] = datetime.datetime.strftime(ctime, jsonrest.TIMEFORMAT)
+  ctime = datetime.datetime.now() - datetime.timedelta(minutes=i)
+  listen_data["ctime"] = jsonrest.strftime(ctime)
   print c.request("listen", listen_data)
 
-print c.request("get", {})
-print c.request("get/peacewalker", {})
-print c.request("get/peacewalker/loadavg", {})
-print c.request("get/peacewalker/loadavg/load1m", {'datatype':'range'})
+print 'get: %s' %c.request("get", {})
+print 'get/peacewalker: %s' %c.request("get/peacewalker", {})
+print 'get/peacewalker/loadavg: %s' %c.request("get/peacewalker/loadavg", {})
+print 'get/peacewalker/loadavg/load1m: %s', c.request("get/peacewalker/loadavg/load1m", {'datatype':'range'})
 start_time = jsonrest.strftime(datetime.datetime.now() - datetime.timedelta(minutes=30))
 end_time = jsonrest.strftime(datetime.datetime.now())
-print c.request("get/peacewalker/loadavg/load1m", {'start_time': start_time,'end_time': end_time, 'datatype':'range'})
-print c.request("get/peacewalker/loadavg/load1m", {'datatype':'last'})
+print 'get/peacewalker/loadavg/load1m(start-end): %s' %c.request("get/peacewalker/loadavg/load1m", {'start_time': start_time,'end_time': end_time, 'datatype':'range'})
+print 'get/peacewalker/loadavg/load1m(last): %s' %c.request("get/peacewalker/loadavg/load1m", {'datatype':'last'})
+print 'get/peacewalker/loadavg/load1m(average): %s' %c.request("get/peacewalker/loadavg/load1m", {'datatype':'average'})
+print 'get/peacewalker/loadavg/load1m(time_range): %s' %c.request("get/peacewalker/loadavg/load1m", {'datatype':'time_range'})
 
 print c.request("getall/peacewalker", {})

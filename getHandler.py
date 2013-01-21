@@ -90,18 +90,34 @@ class Data(webapp.RequestHandler):
         if metricname in values[modulename]:
           r = (values[modulename][metricname])
 
+    logging.info(start_time)
+    logging.info(end_time)
     q.filter('ctime >', start_time).filter('ctime <', end_time)
 
     if datatype == 'range':
-     for v in q.run(limit=settings.query_rows_limit):
+      for v in q.run(limit=settings.query_rows_limit):
         values = jsonrest.loads(v.values)
         if modulename in values:
           if metricname in values[modulename]:
             r.append(values[modulename][metricname])
-    elif datatype == 'time_range':
-      pass
-    elif datatype == 'average':
-      pass
+
+    if datatype == 'time_range':
+      for v in q.run(limit=settings.query_rows_limit):
+        values = jsonrest.loads(v.values)
+        if modulename in values:
+          if metricname in values[modulename]:
+            r.append((str(v.ctime), values[modulename][metricname]))
+
+    if datatype == 'average':
+      summation = 0.0
+      count = 0
+      for v in q.run(limit=settings.query_rows_limit):
+        values = jsonrest.loads(v.values)
+        if modulename in values:
+          if metricname in values[modulename]:
+            summation += (float(values[modulename][metricname]))
+            count += 1
+      r = summation / count
 
     self.response.out.write(jsonrest.response(r))
 
