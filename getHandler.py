@@ -17,6 +17,16 @@ class HostList(webapp.RequestHandler):
       r.append(host.hostname)
     self.response.out.write(jsonrest.response(r))
 
+class LastUpdate(webapp.RequestHandler):
+  def post(self, hostname):
+    host = models.getHostByName(hostname)
+    q = models.Value.all()
+    q = q.filter("host =", host).order("ctime")
+    if q.count(limit=1) != 0:
+      latest_values = q[0]
+      ctime = jsonrest.strftime(latest_values.ctime)
+      self.response.out.write(jsonrest.response(ctime))
+
 class ModuleList(webapp.RequestHandler):
   def post(self, hostname):
     modules = []
@@ -95,11 +105,13 @@ class Data(webapp.RequestHandler):
     q.filter('ctime >', start_time).filter('ctime <', end_time)
 
     if datatype == 'range':
+      counter = 0
       for v in q.run(limit=settings.query_rows_limit):
         values = jsonrest.loads(v.values)
         if modulename in values:
           if metricname in values[modulename]:
-            r.append(values[modulename][metricname])
+            r.append((counter, values[modulename][metricname]))
+        counter += 1
 
     if datatype == 'time_range':
       for v in q.run(limit=settings.query_rows_limit):
@@ -123,5 +135,5 @@ class Data(webapp.RequestHandler):
 
 class GetAllFromHostname(webapp.RequestHandler):
   def post(self, hostname):
-    r = [1,2,3,4,5,6]
+    r = 0
     self.response.out.write(jsonrest.response(r))
