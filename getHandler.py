@@ -5,20 +5,23 @@ from django.utils import simplejson
 import datetime
 import logging
 
+import base
 import settings
 import jsonrest
 import models
 
-class HostList(webapp.RequestHandler):
+class HostList(base.Base):
   def post(self):
+    self.initSession()
     r = list()
     hosts = models.Host.all()
     for host in hosts:
       r.append(host.hostname)
     self.response.out.write(jsonrest.response(r))
 
-class LastUpdate(webapp.RequestHandler):
+class LastUpdate(base.Base):
   def post(self, hostname):
+    self.initSession()
     host = models.getHostByName(hostname)
     q = models.Value.all()
     q = q.filter("host =", host).order("ctime")
@@ -27,8 +30,9 @@ class LastUpdate(webapp.RequestHandler):
       ctime = jsonrest.strftime(latest_values.ctime)
       self.response.out.write(jsonrest.response(ctime))
 
-class ModuleList(webapp.RequestHandler):
+class ModuleList(base.Base):
   def post(self, hostname):
+    self.initSession()
     modules = []
     host = models.getHostByName(hostname)
     q = models.Value.all()
@@ -42,8 +46,9 @@ class ModuleList(webapp.RequestHandler):
         modules.append(k)
     self.response.out.write(jsonrest.response(modules))
 
-class MetricList(webapp.RequestHandler):
+class MetricList(base.Base):
   def post(self, hostname, modulename):
+    self.initSession()
     metrics = []
     host = models.getHostByName(hostname)
     q = models.Value.all()
@@ -58,34 +63,34 @@ class MetricList(webapp.RequestHandler):
         metrics.append(k)
     self.response.out.write(jsonrest.response(metrics))
 
-class Data(webapp.RequestHandler):
+class Data(base.Base):
   def post(self, hostname, modulename, metricname):
+    self.initSession()
     r = []
     host = models.getHostByName(hostname)
-    post = jsonrest.parse_post(self.request.body)
-    if 'end_time' in post:
-      end_time = datetime.datetime.strptime(post['end_time'], jsonrest.TIMEFORMAT)
+    if 'end_time' in self.post:
+      end_time = datetime.datetime.strptime(self.post['end_time'], jsonrest.TIMEFORMAT)
     else:
       end_time = datetime.datetime.now()
 
-    if 'start_time' in post:
-      start_time = datetime.datetime.strptime(post['start_time'], jsonrest.TIMEFORMAT)
+    if 'start_time' in self.post:
+      start_time = datetime.datetime.strptime(self.post['start_time'], jsonrest.TIMEFORMAT)
     else:
       start_time = end_time - settings.default_get_timerange
 
-    if 'sampling' in post:
-      sampling = int(post['sample'])
+    if 'sampling' in self.post:
+      sampling = int(self.post['sample'])
     else:
       sampling = settings.default_get_sampling
 
-    if 'datatype' in post:
-      if post['datatype'] == 'time_range':
+    if 'datatype' in self.post:
+      if self.post['datatype'] == 'time_range':
         datatype = 'time_range'
-      elif post['datatype'] == 'average':
+      elif self.post['datatype'] == 'average':
         datatype = 'average'
-      elif post['datatype'] == 'range':
+      elif self.post['datatype'] == 'range':
         datatype = 'range'
-      elif post['datatype'] == 'last':
+      elif self.post['datatype'] == 'last':
         datatype = 'last'
     else:
       datatype = 'last'
@@ -133,7 +138,7 @@ class Data(webapp.RequestHandler):
 
     self.response.out.write(jsonrest.response(r))
 
-class GetAllFromHostname(webapp.RequestHandler):
+class GetAllFromHostname(base.Base):
   def post(self, hostname):
     r = 0
     self.response.out.write(jsonrest.response(r))

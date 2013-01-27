@@ -7,6 +7,7 @@ import getHandler
 import configHandler
 import listenHandler
 import adminHandler
+import authenHandler
 
 class Homepage(webapp.RequestHandler):
   def get(self):
@@ -15,6 +16,8 @@ class Homepage(webapp.RequestHandler):
 def main():
   application = webapp.WSGIApplication([
     (r'/', Homepage),
+    (r'/authen/get_current_session_key', authenHandler.GetCurrentSessionKey),
+    (r'/authen/create_new_session_key', authenHandler.CreateNewSessionKey),
     # get Handlers
     (r'/get/(.*)/(.*)/(.*)', getHandler.Data),
     (r'/get/(.*)/last_update', getHandler.LastUpdate),
@@ -30,7 +33,7 @@ def main():
     (r'/config/newhost', configHandler.NewHost),
 
     # admin Handlers 
-    (r'/admin/cleardata', adminHandler.ClearData),
+    (r'/admin/newuser', adminHandler.NewUser),
 
     ], debug=True)
   util.run_wsgi_app(application)

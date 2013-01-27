@@ -4,17 +4,18 @@ from django.utils import simplejson
 import datetime
 import logging
 
+import base
 import jsonrest
 import models
 
-class Listen(webapp.RequestHandler):
+class Listen(base.Base):
   def post(self):
-    post = jsonrest.parse_post(self.request.body)
-    hostname = post['hostname']
-    ctime = post['ctime']
-    values = post['values']
+    self.initSession()
+    hostname = self.post['hostname']
+    ctime = self.post['ctime']
+    values = self.post['values']
 
-    ctime = datetime.datetime.strptime(ctime, jsonrest.TIMEFORMAT)
+    ctime = jsonrest.strptime(ctime)
     values_str = jsonrest.dumps(values)
     logging.info(values_str)
     host = models.getHostByName(hostname)

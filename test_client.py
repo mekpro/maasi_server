@@ -4,9 +4,16 @@ import jsonrest
 import datetime
 
 server_ip = "http://localhost:8080/"
-listen_count = 10
+listen_count = 1
 
 c = jsonrest.Client(server_ip)
+print c.request("admin/newuser", {"username": "admin", "password": "password"})
+print c.request("authen/create_new_session_key", {"username": "admin", "password": "password"})
+key = c.request("authen/get_current_session_key", {"username": "admin", "password": "password"})
+print "session key: %s" , key
+
+# Re- Create Client with Session Key
+c = jsonrest.Client(server_ip, key)
 
 # Listen data format
 listen_data = {

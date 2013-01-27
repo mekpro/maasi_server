@@ -18,12 +18,15 @@ def strptime(st):
   return datetime.datetime.strptime(st, TIMEFORMAT)
 
 class Client():
-  def __init__(self, server_url):
+  def __init__(self, server_url, session_key=None):
     self.server_url = server_url
+    self.session_key = session_key
 
-  def request(self, method, param=[]):
+  def request(self, method, param={}):
     result_str = ""
     try:
+      if self.session_key is not None:
+        param["session_key"] = self.session_key
       params = urllib.urlencode(param)
       url = self.server_url + method
       f = urllib2.urlopen(url, params)
