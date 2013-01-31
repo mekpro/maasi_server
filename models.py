@@ -16,7 +16,7 @@ class Host(db.Model):
 class Value(db.Model):
   host = db.ReferenceProperty(Host, required=True)
   ctime = db.DateTimeProperty(required=True, auto_now=True)
-  values = db.StringProperty(required=True) # serialization of key,value
+  values = db.TextProperty(required=True) # serialization of key,value
 
 def getHostByName(hostname):
   hosts = Host.all()

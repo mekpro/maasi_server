@@ -3,7 +3,7 @@ from google.appengine.ext import webapp
 from django.utils import simplejson
 
 import logging
-
+import time
 import settings
 import jsonrest
 import models
@@ -13,6 +13,8 @@ class Base(webapp.RequestHandler):
     self.initialize(request, response)
 
   def initSession(self):
+    if settings.time_log:
+      self.t1 = time.time()
     self.post = jsonrest.parse_post(self.request.body)
     if 'session_key' in self.post:
       session_key = self.post['session_key']

@@ -5,6 +5,7 @@ from django.utils import simplejson
 import datetime
 import logging
 
+import time
 import base
 import settings
 import jsonrest
@@ -19,6 +20,10 @@ class HostList(base.Base):
       r.append(host.hostname)
     self.response.out.write(jsonrest.response(r))
 
+    if settings.time_log:
+      logging.info("Hostlist execution time %f" %(time.time() - self.t1))
+
+
 class LastUpdate(base.Base):
   def post(self, hostname):
     self.initSession()
@@ -29,6 +34,10 @@ class LastUpdate(base.Base):
       latest_values = q[0]
       ctime = jsonrest.strftime(latest_values.ctime)
       self.response.out.write(jsonrest.response(ctime))
+
+    if settings.time_log:
+      logging.info("LastUpdate execution time %f" %(time.time() - self.t1))
+
 
 class ModuleList(base.Base):
   def post(self, hostname):
@@ -45,7 +54,9 @@ class ModuleList(base.Base):
       for k,v in vd.iteritems():
         modules.append(k)
     self.response.out.write(jsonrest.response(modules))
-
+    if settings.time_log:
+      logging.info("ModuleList execution time %f" %(time.time() - self.t1))
+ 
 class MetricList(base.Base):
   def post(self, hostname, modulename):
     self.initSession()
@@ -62,6 +73,9 @@ class MetricList(base.Base):
       for k,v in vdm.iteritems():
         metrics.append(k)
     self.response.out.write(jsonrest.response(metrics))
+    if settings.time_log:
+      logging.info("MetricList execution time %f" %(time.time() - self.t1))
+
 
 class Data(base.Base):
   def post(self, hostname, modulename, metricname):
@@ -105,8 +119,6 @@ class Data(base.Base):
         if metricname in values[modulename]:
           r = (values[modulename][metricname])
 
-    logging.info(start_time)
-    logging.info(end_time)
     q.filter('ctime >', start_time).filter('ctime <', end_time)
 
     if datatype == 'range':
@@ -137,6 +149,8 @@ class Data(base.Base):
       r = summation / count
 
     self.response.out.write(jsonrest.response(r))
+    if settings.time_log:
+      logging.info("GetData execution time %f" %(time.time() - self.t1))
 
 class GetAllFromHostname(base.Base):
   def post(self, hostname):

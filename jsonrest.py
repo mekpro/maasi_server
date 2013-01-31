@@ -58,7 +58,7 @@ def dumps(datadict):
   r = simplejson.dumps(datadict)
   r = r.replace('\"','')
   r = r.replace('\'','\"')
-  logging.info(r)
+  #logging.info(r)
   return r
 
 def loads(datastr):
