@@ -20,5 +20,12 @@ class NewUser(webapp.RequestHandler):
     else:
       user = models.User(username=username, password=password)
       user.put()
-      self.response.out.write("User created: %s" %user.username)
+      self.response.out.write(jsonrest.response("User created: %s" %user.username))
 
+class ClearDatastore(webapp.RequestHandler):
+  def post(self):
+    for q in (models.User, models.Host, models.Value):
+      entries = q.all()
+      entries.fetch(10000)
+      db.delete(entries)
+    self.response.out.write(jsonrest.response('datastore cleared'))

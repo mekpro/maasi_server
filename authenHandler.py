@@ -13,9 +13,9 @@ import models
 def gen_key(length):
   r = ""
   cs = 'abcdefghijklmnopqrstuvwxyz'
-  for i in length:
-    p = random.randint(len(cs))
-    r.append(cs[p])
+  for i in range(0,length):
+    p = random.randint(0,len(cs)-1)
+    r = r + (cs[p])
   return r
 
 #def gen_key(length):

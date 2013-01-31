@@ -8,15 +8,15 @@ import datetime
 server_ip = "http://maasiserver.appspot.com/"
 
 c = jsonrest.Client(server_ip)
+print c.request("admin/cleardatastore", {})
+
 print c.request("admin/newuser", {"username": "admin", "password": "password"})
 print c.request("authen/create_new_session_key", {"username": "admin", "password": "password"})
 key = c.request("authen/get_current_session_key", {"username": "admin", "password": "password"})
 print "session key: %s" , key
 
-# Re- Create Client with Session Key
 c = jsonrest.Client(server_ip, key)
 
-# Listen data format
 listen_data = {
   "hostname": "peacewalker",
   "ctime": "2013-01-18 17:45:03",
@@ -101,8 +101,8 @@ def simulation_data_init(hosts, listen_count):
       c.request("listen", listen_data)
 
 def benchmark_method():
-  simple_init(1)
-  #simulation_data_init(hosts, 1)
+  simple_init(100)
+  simulation_data_init(hosts, 1)
   print 'get: %s' %c.request("get", {})
   print 'get/peacewalker: %s' %c.request("get/peacewalker", {})
   print 'get/peacewalker/last_update: %s' %c.request("get/peacewalker/last_update", {})
