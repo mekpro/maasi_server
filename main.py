@@ -35,6 +35,7 @@ def main():
     # admin Handlers 
     (r'/admin/newuser', adminHandler.NewUser),
     (r'/admin/cleardatastore', adminHandler.ClearDatastore),
+    (r'/admin/bench_datastore/(.*)/(.*)', adminHandler.BenchDatastore),
 
     ], debug=True)
   util.run_wsgi_app(application)

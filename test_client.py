@@ -70,7 +70,7 @@ def simple_init(listen_count):
 def simple_test():
   print 'get: %s' %c.request("get", {})
   print 'get/peacewalker: %s' %c.request("get/peacewalker", {})
-  print 'get/peacewalker/last_update: %s' %c.request("get/peacewalker/last_update", {})
+#  print 'get/peacewalker/last_update: %s' %c.request("get/peacewalker/last_update", {})
   print 'get/peacewalker/loadavg: %s' %c.request("get/peacewalker/loadavg", {})
   print 'get/peacewalker/loadavg/load1m: %s', c.request("get/peacewalker/loadavg/load1m", {'datatype':'range'})
   start_time = jsonrest.strftime(datetime.datetime.now() - datetime.timedelta(minutes=30))
@@ -125,8 +125,15 @@ def benchmark_method():
       listen_data["values"]["modules_"+str(i)]["metrics_"+str(j)] = j
   print c.request("listen", listen_data)
 
+def bench_datastore():
+  simple_init(1)
+  print c.request("admin/bench_datastore/put/100", {})
+  print c.request("admin/bench_datastore/fetch/100", {})
+
+
 if __name__ == '__main__':
-  #simple_init(1)
-  #simple_test()
-  benchmark_method()
+  # simple_init(1)
+  # simple_test()
+  # benchmark_method()
+  bench_datastore()
 

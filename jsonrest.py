@@ -55,7 +55,6 @@ def parse_post(params):
   try:
     r = parse_qsl(params)
     r = dict(r)
-    logging.info(r)
     return r
   except:
     logging.error("error decoding post'%s'" %params)
