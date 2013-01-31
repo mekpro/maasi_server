@@ -4,7 +4,8 @@ import random
 import jsonrest
 import datetime
 
-server_ip = "http://localhost:8080/"
+#server_ip = "http://localhost:8080/"
+server_ip = "http://maasiserver.appspot.com/"
 
 c = jsonrest.Client(server_ip)
 print c.request("admin/newuser", {"username": "admin", "password": "password"})
@@ -100,8 +101,8 @@ def simulation_data_init(hosts, listen_count):
       c.request("listen", listen_data)
 
 def benchmark_method():
-  simple_init(100)
-  simulation_data_init(hosts, 10)
+  simple_init(1)
+  #simulation_data_init(hosts, 1)
   print 'get: %s' %c.request("get", {})
   print 'get/peacewalker: %s' %c.request("get/peacewalker", {})
   print 'get/peacewalker/last_update: %s' %c.request("get/peacewalker/last_update", {})
