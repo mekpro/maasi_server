@@ -33,6 +33,7 @@ def main():
     (r'/config/newhost', configHandler.NewHost),
 
     # admin Handlers 
+    (r'/admin/noop', adminHandler.NoOp),
     (r'/admin/newuser', adminHandler.NewUser),
     (r'/admin/cleardatastore', adminHandler.ClearDatastore),
     (r'/admin/bench_datastore/(.*)/(.*)', adminHandler.BenchDatastore),

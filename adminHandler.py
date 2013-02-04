@@ -24,6 +24,10 @@ class NewUser(webapp.RequestHandler):
       user.put()
       self.response.out.write(jsonrest.response("User created: %s" %user.username))
 
+class NoOp(webapp.RequestHandler):
+  def post(self):
+    return self.response.out.write('{}')
+
 class ClearDatastore(webapp.RequestHandler):
   def post(self):
     for q in (models.User, models.Host, models.Value):

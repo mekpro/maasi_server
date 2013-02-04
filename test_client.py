@@ -4,6 +4,8 @@ import random
 import jsonrest
 import datetime
 
+timezone = datetime.timedelta(hours=0)
+
 #server_ip = "http://localhost:8080/"
 server_ip = "http://maasiserver.appspot.com/"
 
@@ -63,7 +65,7 @@ def randomLogic():
 def simple_init(listen_count):
   print c.request("config/newhost", {"hostname": "peacewalker"})
   for i in range(0, listen_count):
-    ctime = datetime.datetime.now() - datetime.timedelta(minutes=i)
+    ctime = datetime.datetime.now() - datetime.timedelta(minutes=i) + timezone
     listen_data["ctime"] = jsonrest.strftime(ctime)
     print c.request("listen", listen_data)
 
@@ -73,8 +75,8 @@ def simple_test():
 #  print 'get/peacewalker/last_update: %s' %c.request("get/peacewalker/last_update", {})
   print 'get/peacewalker/loadavg: %s' %c.request("get/peacewalker/loadavg", {})
   print 'get/peacewalker/loadavg/load1m: %s', c.request("get/peacewalker/loadavg/load1m", {'datatype':'range'})
-  start_time = jsonrest.strftime(datetime.datetime.now() - datetime.timedelta(minutes=30))
-  end_time = jsonrest.strftime(datetime.datetime.now())
+  start_time = jsonrest.strftime(datetime.datetime.now() - datetime.timedelta(minutes=30)) + timezone
+  end_time = jsonrest.strftime(datetime.datetime.now()) + timezone
   print 'get/peacewalker/loadavg/load1m(start-end): %s' %c.request("get/peacewalker/loadavg/load1m", {'start_time': start_time,'end_time': end_time, 'datatype':'range'})
   print 'get/peacewalker/loadavg/load1m(last): %s' %c.request("get/peacewalker/loadavg/load1m", {'datatype':'last'})
   print 'get/peacewalker/loadavg/load1m(average): %s' %c.request("get/peacewalker/loadavg/load1m", {'datatype':'average'})
@@ -86,7 +88,7 @@ def simulation_data_init(hosts, listen_count):
 
   for host in hosts:
     for i in range(0,listen_count):
-      ctime = datetime.datetime.now() - datetime.timedelta(minutes=i)
+      ctime = datetime.datetime.now() - datetime.timedelta(minutes=i) + timezone
       listen_data["hostname"] = host
       listen_data["ctime"] = jsonrest.strftime(ctime)
       listen_data["values"]["loadavg"]["load1m"] += 0.3 * randomLogic()
@@ -134,6 +136,7 @@ def bench_datastore():
 if __name__ == '__main__':
   # simple_init(1)
   # simple_test()
+  simulation_data_init(hosts, 10)
   # benchmark_method()
-  bench_datastore()
+  # bench_datastore()
 
