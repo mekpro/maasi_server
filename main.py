@@ -31,6 +31,10 @@ def main():
 
     # config Handlers
     (r'/config/newhost', configHandler.NewHost),
+    (r'/config/alarm/add', configHandler.AlarmAdd),
+    (r'/config/alarm/remove', configHandler.AlarmRemove),
+    (r'/config/alarm/list', configHandler.AlarmList),
+    (r'/config/alarm', configHandler.AlarmList),
 
     # admin Handlers 
     (r'/admin/noop', adminHandler.NoOp),

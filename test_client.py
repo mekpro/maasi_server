@@ -6,8 +6,8 @@ import datetime
 
 timezone = datetime.timedelta(hours=0)
 
-#server_ip = "http://localhost:8080/"
-server_ip = "http://maasiserver.appspot.com/"
+server_ip = "http://localhost:8080/"
+#server_ip = "http://maasiserver.appspot.com/"
 
 c = jsonrest.Client(server_ip)
 print c.request("admin/cleardatastore", {})
@@ -75,12 +75,16 @@ def simple_test():
 #  print 'get/peacewalker/last_update: %s' %c.request("get/peacewalker/last_update", {})
   print 'get/peacewalker/loadavg: %s' %c.request("get/peacewalker/loadavg", {})
   print 'get/peacewalker/loadavg/load1m: %s', c.request("get/peacewalker/loadavg/load1m", {'datatype':'range'})
-  start_time = jsonrest.strftime(datetime.datetime.now() - datetime.timedelta(minutes=30)) + timezone
-  end_time = jsonrest.strftime(datetime.datetime.now()) + timezone
+  start_time = jsonrest.strftime(datetime.datetime.now() - datetime.timedelta(minutes=30) + timezone)
+  end_time = jsonrest.strftime(datetime.datetime.now() + timezone)
   print 'get/peacewalker/loadavg/load1m(start-end): %s' %c.request("get/peacewalker/loadavg/load1m", {'start_time': start_time,'end_time': end_time, 'datatype':'range'})
   print 'get/peacewalker/loadavg/load1m(last): %s' %c.request("get/peacewalker/loadavg/load1m", {'datatype':'last'})
   print 'get/peacewalker/loadavg/load1m(average): %s' %c.request("get/peacewalker/loadavg/load1m", {'datatype':'average'})
   print 'get/peacewalker/loadavg/load1m(time_range): %s' %c.request("get/peacewalker/loadavg/load1m", {'datatype':'time_range'})
+  print 'config/alarm/add: %s' %c.request("config/alarm/add", {'alarm_name' :'alarm1', 'host_name': 'peacewalker', 'module_name': 'loadavg', 'metric_name':'load1m', 'operand':'lt', 'value': 2})
+  print 'config/alarm/list: %s' %c.request("config/alarm/list", {})
+  print 'config/alarm/remove: %s' %c.request("config/alarm/remove", {'alarm_name' :'alarm1'})
+  print 'config/alarm: %s' %c.request("config/alarm", {})
 
 def simulation_data_init(hosts, listen_count):
   for host in hosts:
@@ -134,9 +138,9 @@ def bench_datastore():
 
 
 if __name__ == '__main__':
-  # simple_init(1)
-  # simple_test()
-  simulation_data_init(hosts, 10)
+  simple_init(1)
+  simple_test()
+  # simulation_data_init(hosts, 10)
   # benchmark_method()
   # bench_datastore()
 

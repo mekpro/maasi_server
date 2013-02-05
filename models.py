@@ -18,10 +18,16 @@ class Value(db.Model):
   ctime = db.DateTimeProperty(required=True, auto_now=True)
   values = db.TextProperty(required=True) # serialization of key,value
 
+class Alarm(db.Model):
+  alarm_name = db.StringProperty(required=True)
+  host = db.ReferenceProperty(Host, required=True)
+  module = db.StringProperty(required=True)
+  metric = db.StringProperty(required=True)
+  value = db.FloatProperty(required=True)
+  operand = db.StringProperty(required=True)
+
 def getHostByName(hostname):
   hosts = Host.all()
   hosts = hosts.filter('hostname =', hostname)
   host = hosts[0]
   return host
-
-
