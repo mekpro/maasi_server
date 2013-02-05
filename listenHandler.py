@@ -20,8 +20,9 @@ class Listen(base.Base):
 
     ctime = jsonrest.strptime(ctime)
     values_str = jsonrest.dumps(values)
-#    logging.info(values_str)
     host = models.getHostByName(hostname)
+    host.last_update = ctime
+    host.put()
     values = models.Value(host=host, ctime=ctime, values=values_str)
     values.put()
 

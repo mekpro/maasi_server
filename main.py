@@ -8,6 +8,7 @@ import configHandler
 import listenHandler
 import adminHandler
 import authenHandler
+import alarmWorker
 
 class Homepage(webapp.RequestHandler):
   def get(self):
@@ -35,6 +36,9 @@ def main():
     (r'/config/alarm/remove', configHandler.AlarmRemove),
     (r'/config/alarm/list', configHandler.AlarmList),
     (r'/config/alarm', configHandler.AlarmList),
+
+    # worker handlers
+    (r'/worker/alarm', alarmWorker.AlarmWorker),
 
     # admin Handlers 
     (r'/admin/noop', adminHandler.NoOp),
