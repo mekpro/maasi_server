@@ -20,19 +20,20 @@ class AggregateWorker(webapp.RequestHandler):
     hosts = models.Host.all()
     hosts = hosts.filter("last_aggregate <", aggregate_dt_1)
     for host in hosts:
-      starttime = host.last_aggregate
-      endtime = starttime + settings.aggregate_l1
+      start_time = host.last_aggregate
+      end_time = start_time + settings.aggregate_l1
+      logging.info(start_time)
       q = models.Value.all()
       q = q.filter("host =", host)
-      q = q.filter("ctime >", starttime).filter("ctime <", endtime)
+      q = q.filter("ctime >", start_time).filter("ctime <", end_time)
       if q.count(limit=1) > 0:
         values = aggregate(q)
-        new_values = models.ValueL1(host=host, ctime=starttime, values=values)
+        new_values = models.ValueL1(host=host, ctime=start_time, values=values)
         new_values.put()
         logging.info('aggregated %s' %host.hostname)
       else:
-        logging.info('skipped %s on date %s' %(host.hostname, str(starttime)))
-      host.last_aggregate = endtime
+        logging.info('skipped %s on date %s' %(host.hostname, str(start_time)))
+      host.last_aggregate = end_time
       host.put()
     self.response.out.write(jsonrest.response(0))
 

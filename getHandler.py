@@ -76,6 +76,18 @@ class MetricList(base.Base):
     if settings.time_log:
       logging.info("MetricList execution time %f" %(time.time() - self.t1))
 
+def getValueModelFromTimeRange(start_time, end_time):
+  # return models.Value
+  tdelta = end_time - start_time
+  if tdelta < (settings.aggregate_l1 * 10):
+    logging.info('l0')
+    return models.Value
+  elif tdelta < (settings.aggregate_l2 * 10):
+    logging.info('l1')
+    return models.ValueL1
+  else:
+    logging.info('l2')
+    return models.ValueL2
 
 class Data(base.Base):
   def post(self, hostname, modulename, metricname):
@@ -109,9 +121,11 @@ class Data(base.Base):
     else:
       datatype = 'last'
 
-    q = models.Value.all()
+    q = getValueModelFromTimeRange(start_time, end_time)
+    q = q.all()
     q.filter('host =', host)
     q.order('-ctime')
+    logging.info(q.count())
     if datatype == 'last':
       v = q[0]
       values = jsonrest.loads(v.values)

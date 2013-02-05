@@ -37,12 +37,12 @@ def getHostByName(hostname):
 
 class ValueL1(db.Model):
   host = db.ReferenceProperty(Host, required=True)
-  ctime = db.DateTimeProperty(required=True, auto_now=True)
+  ctime = db.DateTimeProperty(required=True)
   values = db.TextProperty(required=True) # serialization of key,value
 
 class ValueL2(db.Model):
   host = db.ReferenceProperty(Host, required=True)
-  ctime = db.DateTimeProperty(required=True, auto_now=True)
+  ctime = db.DateTimeProperty(required=True)
   values = db.TextProperty(required=True) # serialization of key,value
 
 

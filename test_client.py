@@ -9,15 +9,10 @@ timezone = datetime.timedelta(hours=-7)
 server_ip = "http://localhost:8080/"
 #server_ip = "http://maasiserver.appspot.com/"
 
-c = jsonrest.Client(server_ip)
-print c.request("admin/cleardatastore", {})
-
-print c.request("admin/newuser", {"username": "admin", "password": "password"})
-print c.request("authen/create_new_session_key", {"username": "admin", "password": "password"})
-key = c.request("authen/get_current_session_key", {"username": "admin", "password": "password"})
-print "session key: %s" , key
-
-c = jsonrest.Client(server_ip, key)
+def clear_data(c):
+  print c.request("admin/cleardatastore", {})
+  print c.request("admin/newuser", {"username": "admin", "password": "password"})
+  print c.request("authen/create_new_session_key", {"username": "admin", "password": "password"})
 
 listen_data = {
   "hostname": "peacewalker",
@@ -41,18 +36,18 @@ listen_data = {
 
 hosts = [
     'wata__fe',
-    'wata__compute-0-0',
-    'wata__compute-0-1',
-    'wata__compute-0-2',
-    'wata__compute-0-3',
-    'wata__compute-0-4',
-    'wata__compute-0-5',
-    'wata__compute-0-6',
-    'maeka__fe',
-    'maeka__compute-0-0',
-    'maeka__compute-0-1',
-    'maeka__compute-0-2',
-    'maeka__compute-0-3',
+#    'wata__compute-0-0',
+#    'wata__compute-0-1',
+#    'wata__compute-0-2',
+#    'wata__compute-0-3',
+#    'wata__compute-0-4',
+#    'wata__compute-0-5',
+#    'wata__compute-0-6',
+#    'maeka__fe',
+#    'maeka__compute-0-0',
+#    'maeka__compute-0-1',
+#    'maeka__compute-0-2',
+#    'maeka__compute-0-3',
     ]
 
 def randomLogic():
@@ -62,14 +57,14 @@ def randomLogic():
   else:
     return 1
 
-def simple_init(listen_count):
+def simple_init(c, listen_count):
   print c.request("config/newhost", {"hostname": "peacewalker"})
   for i in range(0, listen_count):
     ctime = datetime.datetime.now() - datetime.timedelta(minutes=i) + timezone
     listen_data["ctime"] = jsonrest.strftime(ctime)
     print c.request("listen", listen_data)
 
-def simple_test():
+def simple_test(c):
   print 'get: %s' %c.request("get", {})
   print 'get/peacewalker: %s' %c.request("get/peacewalker", {})
 #  print 'get/peacewalker/last_update: %s' %c.request("get/peacewalker/last_update", {})
@@ -93,7 +88,7 @@ def worker_test():
   print 'config/alarm: %s' %c.request("config/alarm", {})
   print 'worker/alarm: %s' %c.request("worker/alarm", {})
 
-def simulation_data_init(hosts, listen_count):
+def simulation_data_init(c, hosts, listen_count):
   for host in hosts:
     print c.request("config/newhost", {"hostname": host})
 
@@ -113,7 +108,7 @@ def simulation_data_init(hosts, listen_count):
       listen_data["values"]["netinterface"]["eth1__tx"] += 10 * randomLogic()
       c.request("listen", listen_data)
 
-def benchmark_method():
+def benchmark_method(c):
   simple_init(100)
   simulation_data_init(hosts, 1)
   print 'get: %s' %c.request("get", {})
@@ -138,21 +133,35 @@ def benchmark_method():
       listen_data["values"]["modules_"+str(i)]["metrics_"+str(j)] = j
   print c.request("listen", listen_data)
 
-def bench_datastore():
+def bench_datastore(c):
   simple_init(1)
   print c.request("admin/bench_datastore/put/100", {})
   print c.request("admin/bench_datastore/fetch/100", {})
 
-def aggregate_test():
-  for i in range(0,100):
-    print c.request("worker/aggregate", {})
+def aggregate_test(c):
+  for i in range(0,60):
+    print 'aggregating %s' %c.request("worker/aggregate", {})
+  start_time = jsonrest.strftime(datetime.datetime.now() - datetime.timedelta(minutes=120) + timezone)
+  end_time = jsonrest.strftime(datetime.datetime.now() + timezone)
+  print 'time: %s - %s ' %(str(start_time),str(end_time))
+  print 'get/peacewalker/loadavg/load1m(start-end): %s' %c.request("get/wata__fe/loadavg/load1m", {'start_time': start_time,'end_time': end_time, 'datatype':'range'})
+
+  start_time = jsonrest.strftime(datetime.datetime.now() - datetime.timedelta(minutes=600) + timezone)
+  print 'get/peacewalker/loadavg/load1m(start-end): %s' %c.request("get/wata__fe/loadavg/load1m", {'start_time': start_time,'end_time': end_time, 'datatype':'range'})
+
 
 if __name__ == '__main__':
-  simple_init(1)
-  simulation_data_init(hosts, 30)
-  # simple_test()
-  # simulation_data_init(hosts, 10)
-  # benchmark_method()
-  # bench_datastore()
-  # worker_test()
-  aggregate_test()
+  c = jsonrest.Client(server_ip)
+  clear_data(c)
+  key = c.request("authen/get_current_session_key", {"username": "admin", "password": "password"})
+  print "session key: %s" , key
+  c = jsonrest.Client(server_ip, key)
+
+  simple_init(c,1)
+  simulation_data_init(c,hosts, 600)
+  # simple_test(c)
+  # simulation_data_init(c,hosts, 10)
+  # benchmark_method(c)
+  # bench_datastore(c)
+  # worker_test(c)
+  aggregate_test(c)

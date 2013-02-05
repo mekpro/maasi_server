@@ -30,7 +30,7 @@ class NoOp(webapp.RequestHandler):
 
 class ClearDatastore(webapp.RequestHandler):
   def post(self):
-    for q in (models.User, models.Host, models.Value):
+    for q in (models.User, models.Host, models.Value, models.Alarm, models.ValueL1, models.ValueL2):
       entries = q.all()
       entries.fetch(10000)
       db.delete(entries)

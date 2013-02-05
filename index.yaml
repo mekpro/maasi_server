@@ -20,3 +20,15 @@ indexes:
   - name: host
   - name: ctime
     direction: desc
+
+- kind: ValueL1
+  properties:
+  - name: host
+  - name: ctime
+    direction: desc
+
+- kind: ValueL2
+  properties:
+  - name: host
+  - name: ctime
+    direction: desc
