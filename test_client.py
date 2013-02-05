@@ -86,6 +86,13 @@ def simple_test():
   print 'config/alarm/remove: %s' %c.request("config/alarm/remove", {'alarm_name' :'alarm1'})
   print 'config/alarm: %s' %c.request("config/alarm", {})
 
+def worker_test():
+  print 'config/alarm/add: %s' %c.request("config/alarm/add", {'alarm_name' :'alarm1', 'host_name': 'peacewalker', 'module_name': 'loadavg', 'metric_name':'load1m', 'operand':'lt', 'value': 2})
+  print 'config/alarm/list: %s' %c.request("config/alarm/list", {})
+  print 'config/alarm/remove: %s' %c.request("config/alarm/remove", {'alarm_name' :'alarm1'})
+  print 'config/alarm: %s' %c.request("config/alarm", {})
+  print 'worker/alarm: %s' %c.request("worker/alarm", {})
+
 def simulation_data_init(hosts, listen_count):
   for host in hosts:
     print c.request("config/newhost", {"hostname": host})
@@ -140,6 +147,7 @@ def bench_datastore():
 if __name__ == '__main__':
   simple_init(1)
   simple_test()
+  worker_test()
   # simulation_data_init(hosts, 10)
   # benchmark_method()
   # bench_datastore()
