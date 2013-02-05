@@ -9,6 +9,7 @@ import listenHandler
 import adminHandler
 import authenHandler
 import alarmWorker
+import aggregateWorker
 
 class Homepage(webapp.RequestHandler):
   def get(self):
@@ -39,6 +40,8 @@ def main():
 
     # worker handlers
     (r'/worker/alarm', alarmWorker.AlarmWorker),
+    (r'/worker/aggregate', alarmWorker.AggregateWorker),
+    (r'/worker/cleanup', alarmWorker.CleanupWorker),
 
     # admin Handlers 
     (r'/admin/noop', adminHandler.NoOp),

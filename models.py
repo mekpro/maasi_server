@@ -9,9 +9,10 @@ class User(db.Model):
 class Host(db.Model):
   hostname = db.StringProperty(required=True)
   owner = db.ReferenceProperty(required=True)
-  last_update = db.DateTimeProperty(required=True, auto_now=True)
   state = db.StringProperty(required=True, choices=set(['up','down']), default="up")
   configs = db.StringProperty(required=True) # serialization of key,value
+  last_update = db.DateTimeProperty(required=True, auto_now=True)
+  last_aggregate = db.DateTimeProperty(required=True, auto_now=True)
 
 class Value(db.Model):
   host = db.ReferenceProperty(Host, required=True)
@@ -31,3 +32,15 @@ def getHostByName(hostname):
   hosts = hosts.filter('hostname =', hostname)
   host = hosts[0]
   return host
+
+class ValueL1(db.Model):
+  host = db.ReferenceProperty(Host, required=True)
+  ctime = db.DateTimeProperty(required=True, auto_now=True)
+  values = db.TextProperty(required=True) # serialization of key,value
+
+class ValueL2(db.Model):
+  host = db.ReferenceProperty(Host, required=True)
+  ctime = db.DateTimeProperty(required=True, auto_now=True)
+  values = db.TextProperty(required=True) # serialization of key,value
+
+
