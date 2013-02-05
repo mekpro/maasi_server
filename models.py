@@ -1,6 +1,8 @@
 import datetime
 from google.appengine.ext import db
 
+start_date = datetime.datetime.now() - datetime.timedelta(hours=4)
+
 class User(db.Model):
   username = db.StringProperty(required=True)
   password = db.StringProperty(required=True)
@@ -12,11 +14,11 @@ class Host(db.Model):
   state = db.StringProperty(required=True, choices=set(['up','down']), default="up")
   configs = db.StringProperty(required=True) # serialization of key,value
   last_update = db.DateTimeProperty(required=True, auto_now=True)
-  last_aggregate = db.DateTimeProperty(required=True, auto_now=True)
+  last_aggregate = db.DateTimeProperty(required=True, default=start_date)
 
 class Value(db.Model):
   host = db.ReferenceProperty(Host, required=True)
-  ctime = db.DateTimeProperty(required=True, auto_now=True)
+  ctime = db.DateTimeProperty(required=True)
   values = db.TextProperty(required=True) # serialization of key,value
 
 class Alarm(db.Model):

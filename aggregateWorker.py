@@ -9,31 +9,39 @@ import datetime
 import logging
 import settings
 
-def aggreate(values_list):
-  return values_list[0]
+def aggregate(values_list):
+  values = values_list[0].values
+  logging.info(values)
+  return values
 
 class AggregateWorker(webapp.RequestHandler):
-  def post():
+  def post(self):
     aggregate_dt_1 = datetime.datetime.now() - settings.aggregate_l1
-    hosts = models.Hosts.all()
+    hosts = models.Host.all()
     hosts = hosts.filter("last_aggregate <", aggregate_dt_1)
     for host in hosts:
       starttime = host.last_aggregate
-      endtime = starttime + setting.aggregate_l1
-      values_list = models.values.all()
-      values_list = values.filter("ctime >", starttime).filter("ctime <", endtime)
-      values = aggregate(values_list)
-      new_values = models.ValueL1(host=host, ctime=starttime, values=values)
-      new_values.put()
+      endtime = starttime + settings.aggregate_l1
+      q = models.Value.all()
+      q = q.filter("host =", host)
+      q = q.filter("ctime >", starttime).filter("ctime <", endtime)
+      if q.count(limit=1) > 0:
+        values = aggregate(q)
+        new_values = models.ValueL1(host=host, ctime=starttime, values=values)
+        new_values.put()
+        logging.info('aggregated %s' %host.hostname)
+      else:
+        logging.info('skipped %s on date %s' %(host.hostname, str(starttime)))
       host.last_aggregate = endtime
       host.put()
-      logging.info('aggregated %s' %host.hostname)
+    self.response.out.write(jsonrest.response(0))
 
 class CleanupWorker(webapp.RequestHandler):
-  def post():
-    values = models.Values.all()
+  def post(self):
+    values = models.Value.all()
     cleanup_dt = datetime.datetime.now() - settings.aggregate_cleanup
     values.filter("ctime <", cleanup_dt)
     values.fetch(10000)
     db.delete(values)
     logging.info('Clean up completed')
+    self.response.out.write(jsonrest.response(0))

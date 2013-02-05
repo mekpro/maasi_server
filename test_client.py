@@ -4,7 +4,7 @@ import random
 import jsonrest
 import datetime
 
-timezone = datetime.timedelta(hours=0)
+timezone = datetime.timedelta(hours=-7)
 
 server_ip = "http://localhost:8080/"
 #server_ip = "http://maasiserver.appspot.com/"
@@ -143,12 +143,16 @@ def bench_datastore():
   print c.request("admin/bench_datastore/put/100", {})
   print c.request("admin/bench_datastore/fetch/100", {})
 
+def aggregate_test():
+  for i in range(0,100):
+    print c.request("worker/aggregate", {})
 
 if __name__ == '__main__':
   simple_init(1)
-  simple_test()
-  worker_test()
+  simulation_data_init(hosts, 30)
+  # simple_test()
   # simulation_data_init(hosts, 10)
   # benchmark_method()
   # bench_datastore()
-
+  # worker_test()
+  aggregate_test()

@@ -40,8 +40,8 @@ def main():
 
     # worker handlers
     (r'/worker/alarm', alarmWorker.AlarmWorker),
-    (r'/worker/aggregate', alarmWorker.AggregateWorker),
-    (r'/worker/cleanup', alarmWorker.CleanupWorker),
+    (r'/worker/aggregate', aggregateWorker.AggregateWorker),
+    (r'/worker/cleanup', aggregateWorker.CleanupWorker),
 
     # admin Handlers 
     (r'/admin/noop', adminHandler.NoOp),
