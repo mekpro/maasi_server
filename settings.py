@@ -1,6 +1,6 @@
 import datetime
 
-time_log = False
+time_log = True 
 default_get_timerange = datetime.timedelta(minutes=60)
 host_timeout = datetime.timedelta(minutes=5)
 default_get_sampling = 60

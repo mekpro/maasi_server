@@ -121,11 +121,13 @@ class Data(base.Base):
     else:
       datatype = 'last'
 
+    logging.info("date range: %s - %s" %(start_time, end_time))
     q = getValueModelFromTimeRange(start_time, end_time)
     q = q.all()
     q.filter('host =', host)
     q.order('-ctime')
-    logging.info(q.count())
+    logging.info("row count: %d" %q.count())
+
     if datatype == 'last':
       v = q[0]
       values = jsonrest.loads(v.values)
@@ -166,7 +168,86 @@ class Data(base.Base):
     if settings.time_log:
       logging.info("GetData execution time %f" %(time.time() - self.t1))
 
-class GetAllFromHostname(base.Base):
+def parseQuery(query_json):
+  d = {'peacewalker': {'loadavg' : ['load1m']}}
+  return d
+
+class GetAll(base.Base):
   def post(self, hostname):
-    r = 0
+    self.initSession()
+    r = {}
+    host = models.getHostByName(hostname)
+    if 'end_time' in self.post:
+      end_time = datetime.datetime.strptime(self.post['end_time'], jsonrest.TIMEFORMAT)
+    else:
+      end_time = datetime.datetime.now()
+
+    if 'start_time' in self.post:
+      start_time = datetime.datetime.strptime(self.post['start_time'], jsonrest.TIMEFORMAT)
+    else:
+      start_time = end_time - settings.default_get_timerange
+
+    if 'sampling' in self.post:
+      sampling = int(self.post['sample'])
+    else:
+      sampling = settings.default_get_sampling
+
+    if 'datatype' in self.post:
+      if self.post['datatype'] == 'time_range':
+        datatype = 'time_range'
+      elif self.post['datatype'] == 'average':
+        datatype = 'average'
+      elif self.post['datatype'] == 'range':
+        datatype = 'range'
+      elif self.post['datatype'] == 'last':
+        datatype = 'last'
+    else:
+      datatype = 'last'
+
+    logging.info("date range: %s - %s" %(start_time, end_time))
+    q = getValueModelFromTimeRange(start_time, end_time)
+    q = q.all()
+    q.filter('host =', host)
+    q.order('-ctime')
+    logging.info("row count: %d" %q.count())
+
+    if datatype == 'last' or datatype == 'average':
+      v = q[0]
+      values = jsonrest.loads(v.values)
+      r = values
+
+    q.filter('ctime >', start_time).filter('ctime <', end_time)
+    if datatype == 'range':
+      counter = 0
+      for v in q.run(limit=settings.query_rows_limit):
+        values = jsonrest.loads(v.values)
+        for module_name,metrics in values.items():
+          if module_name not in r:
+            r[module_name] = {}
+          for metric_name,value in metrics.items():
+            if metric_name not in r[module_name]:
+              r[module_name][metric_name] = []
+            else:
+              r[module_name][metric_name].append((counter, values[module_name][metric_name]))
+        counter += 1
+
+    if datatype == 'time_range':
+      for v in q.run(limit=settings.query_rows_limit):
+        values = jsonrest.loads(v.values)
+        for module_name,metrics in values.items():
+          if module_name not in r:
+            r[module_name] = {}
+          for metric_name,value in metrics.items():
+            if metric_name not in r[module_name]:
+              r[module_name][metric_name] = []
+            else:
+              r[module_name][metric_name].append((str(v.ctime), values[module_name][metric_name]))
+
+#    if datatype == 'average':
+
     self.response.out.write(jsonrest.response(r))
+    if settings.time_log:
+      logging.info("GetAllData execution time %f" %(time.time() - self.t1))
+
+
+

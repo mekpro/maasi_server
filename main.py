@@ -26,7 +26,7 @@ def main():
     (r'/get/(.*)/(.*)', getHandler.MetricList),
     (r'/get/(.*)', getHandler.ModuleList),
     (r'/get', getHandler.HostList),
-    (r'/getall/(.*)', getHandler.GetAllFromHostname),
+    (r'/getall/(.*)', getHandler.GetAll),
 
     # listen Handlers
     (r'/listen', listenHandler.Listen),

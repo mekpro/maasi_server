@@ -82,6 +82,7 @@ def simple_test(c):
   print 'get/peacewalker/loadavg/load1m(last): %s' %c.request("get/peacewalker/loadavg/load1m", {'datatype':'last'})
   print 'get/peacewalker/loadavg/load1m(average): %s' %c.request("get/peacewalker/loadavg/load1m", {'datatype':'average'})
   print 'get/peacewalker/loadavg/load1m(time_range): %s' %c.request("get/peacewalker/loadavg/load1m", {'datatype':'time_range'})
+  print 'getall/peacewalker: %s' %c.request("getall/peacewalker", {'datatype':'range'})
   print 'config/alarm/add: %s' %c.request("config/alarm/add", {'alarm_name' :'alarm1', 'host_name': 'peacewalker', 'module_name': 'loadavg', 'metric_name':'load1m', 'operand':'lt', 'value': 2})
   print 'config/alarm/list: %s' %c.request("config/alarm/list", {})
   print 'config/alarm/remove: %s' %c.request("config/alarm/remove", {'alarm_name' :'alarm1'})
@@ -186,9 +187,9 @@ if __name__ == '__main__':
   print "session key: %s" , key
   c = jsonrest.Client(server_ip, key)
 
-  simple_init(c,1)
+  simple_init(c,100)
 
-  # simple_test(c)
+  simple_test(c)
   # simulation_data_init(c,hosts, 100)
   # simulation_data_init(c,hosts, 10)
   # benchmark_method(c)
