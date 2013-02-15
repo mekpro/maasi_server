@@ -244,6 +244,7 @@ class GetAll(base.Base):
               r[module_name][metric_name].append((str(v.ctime), values[module_name][metric_name]))
 
 #    if datatype == 'average':
+# TODO !!
 
     self.response.out.write(jsonrest.response(r))
     if settings.time_log:

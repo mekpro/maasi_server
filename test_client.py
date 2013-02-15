@@ -45,13 +45,13 @@ hosts = [
     'wata__compute-0-2',
     'wata__compute-0-3',
     'wata__compute-0-4',
-#    'wata__compute-0-5',
-#    'wata__compute-0-6',
+    'wata__compute-0-5',
+    'wata__compute-0-6',
     'maeka__fe',
     'maeka__compute-0-0',
-#    'maeka__compute-0-1',
-#    'maeka__compute-0-2',
-#    'maeka__compute-0-3',
+    'maeka__compute-0-1',
+    'maeka__compute-0-2',
+    'maeka__compute-0-3',
     ]
 
 def randomLogic():
@@ -187,10 +187,9 @@ if __name__ == '__main__':
   print "session key: %s" , key
   c = jsonrest.Client(server_ip, key)
 
-  simple_init(c,100)
-
-  simple_test(c)
-  # simulation_data_init(c,hosts, 100)
+  simple_init(c,1)
+  # simple_test(c)
+  simulation_data_init(c,hosts, 100)
   # simulation_data_init(c,hosts, 10)
   # benchmark_method(c)
   # bench_datastore(c)
