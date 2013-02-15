@@ -1,5 +1,7 @@
+from multiprocessing import Process
 import sys
 
+import time
 import random
 import jsonrest
 import datetime
@@ -8,13 +10,15 @@ timezone = datetime.timedelta(hours=-7)
 
 server_ip = "http://localhost:8080/"
 #server_ip = "http://maasiserver.appspot.com/"
+#server_ip = "http://10.1.1.186:8080/"
 
 def clear_data(c):
   print c.request("admin/cleardatastore", {})
   print c.request("admin/newuser", {"username": "admin", "password": "password"})
   print c.request("authen/create_new_session_key", {"username": "admin", "password": "password"})
 
-listen_data = {
+def generate_mockup_data():
+  return  {
   "hostname": "peacewalker",
   "ctime": "2013-01-18 17:45:03",
   "values" : {
@@ -36,15 +40,15 @@ listen_data = {
 
 hosts = [
     'wata__fe',
-#    'wata__compute-0-0',
-#    'wata__compute-0-1',
-#    'wata__compute-0-2',
-#    'wata__compute-0-3',
-#    'wata__compute-0-4',
+    'wata__compute-0-0',
+    'wata__compute-0-1',
+    'wata__compute-0-2',
+    'wata__compute-0-3',
+    'wata__compute-0-4',
 #    'wata__compute-0-5',
 #    'wata__compute-0-6',
-#    'maeka__fe',
-#    'maeka__compute-0-0',
+    'maeka__fe',
+    'maeka__compute-0-0',
 #    'maeka__compute-0-1',
 #    'maeka__compute-0-2',
 #    'maeka__compute-0-3',
@@ -58,6 +62,7 @@ def randomLogic():
     return 1
 
 def simple_init(c, listen_count):
+  listen_data = generate_mockup_data()
   print c.request("config/newhost", {"hostname": "peacewalker"})
   for i in range(0, listen_count):
     ctime = datetime.datetime.now() - datetime.timedelta(minutes=i) + timezone
@@ -65,6 +70,7 @@ def simple_init(c, listen_count):
     print c.request("listen", listen_data)
 
 def simple_test(c):
+  listen_data = generate_mockup_data()
   print 'get: %s' %c.request("get", {})
   print 'get/peacewalker: %s' %c.request("get/peacewalker", {})
 #  print 'get/peacewalker/last_update: %s' %c.request("get/peacewalker/last_update", {})
@@ -88,14 +94,18 @@ def worker_test():
   print 'config/alarm: %s' %c.request("config/alarm", {})
   print 'worker/alarm: %s' %c.request("worker/alarm", {})
 
-def simulation_data_init(c, hosts, listen_count):
-  for host in hosts:
-    print c.request("config/newhost", {"hostname": host})
+class SimDataGenProcess(Process):
+  def __init__(self, connection, host, listen_count):
+    Process.__init__(self)
+    self.c = connection
+    self.host = host
+    self.listen_count = listen_count
 
-  for host in hosts:
-    for i in range(0,listen_count):
+  def run(self):
+    listen_data = generate_mockup_data()
+    listen_data["hostname"] = self.host
+    for i in range(0,self.listen_count):
       ctime = datetime.datetime.now() - datetime.timedelta(minutes=i) + timezone
-      listen_data["hostname"] = host
       listen_data["ctime"] = jsonrest.strftime(ctime)
       listen_data["values"]["loadavg"]["load1m"] += 0.3 * randomLogic()
       listen_data["values"]["loadavg"]["load5m"] += 0.2 * randomLogic()
@@ -106,9 +116,28 @@ def simulation_data_init(c, hosts, listen_count):
       listen_data["values"]["netinterface"]["eth0__tx"] += 10 * randomLogic()
       listen_data["values"]["netinterface"]["eth1__rx"] += 10 * randomLogic()
       listen_data["values"]["netinterface"]["eth1__tx"] += 10 * randomLogic()
-      c.request("listen", listen_data)
+      self.c.request("listen", listen_data)
+
+def simulation_data_init(c, hosts, listen_count):
+  process_list = []
+  for host in hosts:
+    print c.request("config/newhost", {"hostname": host})
+  for host in hosts:
+    p = SimDataGenProcess(c, host, 100)
+    p.start()
+    process_list.append(p)
+
+  for p in process_list:
+    while True:
+      if p.is_alive():
+        time.sleep(1)
+      else:
+        print "process %s completed" %str(p)
+        break
+
 
 def benchmark_method(c):
+  listen_data = generate_mockup_data()
   simple_init(100)
   simulation_data_init(hosts, 1)
   print 'get: %s' %c.request("get", {})
@@ -158,10 +187,11 @@ if __name__ == '__main__':
   c = jsonrest.Client(server_ip, key)
 
   simple_init(c,1)
-  simulation_data_init(c,hosts, 600)
+
   # simple_test(c)
+  # simulation_data_init(c,hosts, 100)
   # simulation_data_init(c,hosts, 10)
   # benchmark_method(c)
   # bench_datastore(c)
   # worker_test(c)
-  aggregate_test(c)
+  # aggregate_test(c)
